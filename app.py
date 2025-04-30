@@ -6,10 +6,10 @@ import urllib.request
 import os
 import pandas as pd
 
-# Set konfigurasi halaman
+
 st.set_page_config(page_title="Prediksi Suhu LSTM", layout="wide")
 
-# UI Styling (CSS)
+
 st.markdown("""
     <style>
     body, .stApp {
@@ -52,7 +52,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Fungsi download file dari GitHub
+
 @st.cache_resource
 def download_file(url, filename):
     if not os.path.exists(filename):
@@ -64,21 +64,21 @@ def download_file(url, filename):
             return False
     return True
 
-# URL GitHub Raw (ganti USERNAME & REPO sesuai milikmu)
+
 SCALER_URL = "https://github.com/riosp-lab/riosp-lab/raw/main/scaler.pkl"
 MODEL_URL = "https://github.com/riosp-lab/riosp-lab/raw/main/model.tflite"
 DATA_URL = "https://github.com/riosp-lab/riosp-lab/raw/main/jena_climate_mini.csv"
 
-# Judul
+
 st.title("🌡️ Prediksi Suhu Menggunakan LSTM")
 
-# Sidebar
+
 with st.sidebar:
     st.header("🔧 Pengaturan")
     st.info("Model LSTM (.tflite) + Scaler digunakan untuk memprediksi suhu.")
     show_dataset = st.checkbox("📊 Tampilkan Dataset Contoh")
 
-# Load Scaler
+
 scaler_loaded = False
 if download_file(SCALER_URL, "scaler.pkl"):
     try:
@@ -93,7 +93,7 @@ if download_file(SCALER_URL, "scaler.pkl"):
         scaler.fit(dummy_data)
         st.sidebar.warning("⚠️ Menggunakan scaler dummy")
 
-# Load Model
+
 model_loaded = False
 if download_file(MODEL_URL, "model.tflite"):
     try:
@@ -107,7 +107,7 @@ if download_file(MODEL_URL, "model.tflite"):
         st.sidebar.error(f"❌ Model gagal dimuat: {e}")
         st.stop()
 
-# Fungsi Prediksi
+
 def predict(data):
     if not scaler_loaded or not model_loaded:
         st.error("❗ Model atau scaler belum tersedia.")
@@ -124,7 +124,7 @@ def predict(data):
         st.error(f"❌ Error saat prediksi: {e}")
         return None
 
-# Input User
+
 st.header("📝 Masukkan Data Suhu (10 Nilai Terakhir)")
 cols = st.columns(5)
 input_data = []
@@ -141,7 +141,7 @@ for i in range(10):
         )
         input_data.append(value)
 
-# Tombol Prediksi
+
 if st.button("🚀 Prediksi Sekarang", type="primary"):
     with st.spinner("Memproses..."):
         result = predict(input_data)
@@ -150,7 +150,7 @@ if st.button("🚀 Prediksi Sekarang", type="primary"):
         st.success(f"🎯 Prediksi Suhu: **{result:.2f} °C**")
         st.balloons()
 
-# Dataset Opsional
+
 if show_dataset and download_file(DATA_URL, "jena_climate_mini.csv"):
     try:
         df = pd.read_csv("jena_climate_mini.csv")
